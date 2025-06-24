@@ -1,4 +1,4 @@
-const API = "/api/generate-quiz?url=";
+const API = "/api/assessment-generator?url=";
 const link = document.getElementById("link");
 const genBtn = document.getElementById("generate");
 const loadDiv = document.getElementById("loading");
