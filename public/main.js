@@ -41,7 +41,7 @@ genBtn.onclick = async () => {
     currentAnswers = [];
 
     lines.forEach((line) => {
-      if (line.match(/^\d+\./)) {
+      if (line.match(/^(?:\*\*)?(?:Question\s*)?\d+[:.]?/i)) {
         const q = document.createElement("p");
         q.textContent = line;
         quizForm.appendChild(q);
@@ -57,8 +57,11 @@ genBtn.onclick = async () => {
         quizForm.appendChild(radio);
         quizForm.appendChild(label);
         quizForm.appendChild(document.createElement("br"));
-      } else if (line.startsWith("Answer:")) {
-        currentAnswers.push(line.replace("Answer: ", "").trim());
+      } else if (line.toLowerCase().includes("answer:")) {
+        const answerMatch = line.match(/answer:\s*([A-D])/i);
+        if (answerMatch) {
+            currentAnswers.push(answerMatch[1].toUpperCase());
+        }
       }
     });
 
