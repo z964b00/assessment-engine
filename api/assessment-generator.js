@@ -26,7 +26,18 @@ export default async function handler(req, res) {
         {
           role: "user",
           content:
-            `Create EXACTLY three multiple-choice questions (A-D) with answers:\n\n---\n${text}`,
+            `Generate a 3-question multiple-choice quiz based on the article at this URL.
+            Return the quiz as a JSON object in the following format:
+            {
+                "questions": [
+                    {
+                    "question": "What is the capital of France?",
+                    "options": ["Berlin", "Madrid", "Paris", "Rome"],
+                    "answer": "C"
+                    }
+                ]
+            }
+            Do not include any explanation or commentary. Just return the JSON object only`,
         },
       ],
     });

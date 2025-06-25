@@ -7,67 +7,57 @@ const completeBtn = document.getElementById("complete");
 const clearBtn = document.getElementById("clear");
 const resultsPre = document.getElementById("results");
 
-let currentAnswers = []; // e.g., ["A", "C", "D"]
+let currentAnswers = [];
 
 genBtn.onclick = async () => {
   const url = link.value.trim();
   if (!url) return alert("Enter a link first.");
   loadDiv.classList.remove("hidden");
   genBtn.disabled = true;
-  resultsPre.textContent = ""; // Clear previous results
+  resultsPre.textContent = "";
 
   try {
     const res = await fetch(API + encodeURIComponent(url));
     const data = await res.json();
-    console.log("Raw quiz data:", data); // 👈 Log full response for inspection
+    console.log("Fetched quiz:", data);
 
     loadDiv.classList.add("hidden");
     genBtn.disabled = false;
 
-    if (data.error) {
-      alert(data.error);
-      return;
+    if (data.error) return alert(data.error);
+    if (!data.questions || !Array.isArray(data.questions)) {
+      throw new Error("Quiz is not formatted as expected.");
     }
 
-    if (!data.quiz || typeof data.quiz !== "string") {
-      throw new Error("Quiz data missing or not a string");
-    }
-
-    // Render questions
+    // Render the quiz
     quizForm.innerHTML = "";
-    const lines = data.quiz.split("\n").filter(Boolean);
-    console.log("Parsed lines:", lines); // 👈 Log lines for debugging
-
     currentAnswers = [];
 
-    lines.forEach((line) => {
-      if (line.match(/^(?:\*\*)?(?:Question\s*)?\d+[:.]?/i)) {
-        const q = document.createElement("p");
-        q.textContent = line;
-        quizForm.appendChild(q);
-      } else if (line.match(/^[A-D]\./)) {
-        const radio = document.createElement("input");
-        const label = document.createElement("label");
-        const letter = line[0]; // A/B/C/D
-        const questionNum = quizForm.querySelectorAll("p").length - 1;
-        radio.type = "radio";
-        radio.name = "q" + questionNum;
-        radio.value = letter;
-        label.textContent = " " + line;
-        quizForm.appendChild(radio);
-        quizForm.appendChild(label);
-        quizForm.appendChild(document.createElement("br"));
-      } else if (line.toLowerCase().includes("answer:")) {
-        const answerMatch = line.match(/answer:\s*([A-D])/i);
-        if (answerMatch) {
-            currentAnswers.push(answerMatch[1].toUpperCase());
-        }
-      }
-    });
+    data.questions.forEach((q, index) => {
+      const fieldset = document.createElement("fieldset");
 
-    if (quizForm.querySelectorAll("p").length === 0 || currentAnswers.length === 0) {
-      throw new Error("No questions or answers were rendered");
-    }
+      const legend = document.createElement("legend");
+      legend.textContent = `Q${index + 1}. ${q.question}`;
+      fieldset.appendChild(legend);
+
+      q.options.forEach((option, optIndex) => {
+        const label = document.createElement("label");
+        const input = document.createElement("input");
+        const letter = String.fromCharCode(65 + optIndex); // A, B, C, D...
+
+        input.type = "radio";
+        input.name = `q${index}`;
+        input.value = letter;
+
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(` ${letter}. ${option}`));
+        fieldset.appendChild(label);
+        fieldset.appendChild(document.createElement("br"));
+      });
+
+      currentAnswers.push(q.answer.toUpperCase());
+      quizForm.appendChild(fieldset);
+    });
 
     quizForm.classList.remove("hidden");
     completeBtn.classList.remove("hidden");
@@ -95,10 +85,10 @@ completeBtn.onclick = () => {
     const isRight = pick === currentAnswers[i];
     if (isRight) correct++;
     output += `Q${i + 1}: You picked ${pick}. ${
-      isRight ? "✔️ Correct!" : "❌ Wrong"
+      isRight ? "✔️ Correct!" : `❌ Wrong (Correct: ${currentAnswers[i]})`
     }\n`;
   });
-  output += `\nTotal score: ${correct}/3\n`;
+  output += `\nTotal score: ${correct}/${currentAnswers.length}\n`;
   resultsPre.textContent = output;
 
   sessionStorage.setItem("latestScore", correct);
