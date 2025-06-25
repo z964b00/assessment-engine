@@ -69,7 +69,7 @@ completeBtn.onclick = () => {
     const isRight = pick === currentAnswers[i];
     if (isRight) correct++;
     output += `Q${i + 1}: You picked ${pick}. ${
-      isRight ? "✔️ Correct!" : "❌ Wrong"
+      isRight ? "✔️ Correct!" : `❌ Wrong (Correct: ${currentAnswers[i]})`
     }\n`;
   });
   output += `\nTotal score: ${correct}/3\n`;
