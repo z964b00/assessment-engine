@@ -26,18 +26,18 @@ export default async function handler(req, res) {
         {
           role: "user",
           content:
-            `Generate a 3-question multiple-choice quiz based on the article at this URL.
-            Return the quiz as a JSON object in the following format:
-            {
-                "questions": [
-                    {
-                    "question": "What is the capital of France?",
-                    "options": ["Berlin", "Madrid", "Paris", "Rome"],
-                    "answer": "C"
-                    }
-                ]
-            }
-            Do not include any explanation or commentary. Just return the JSON object only`,
+            `Create EXACTLY three multiple-choice questions (A-D) with answers:\n\n---\n${text}.
+            Each question must start with Q1., Q2., etc.
+            Each answer option must start with A., B., C., D.
+            The answer line must be in the form: Answer: X (X being A–D).
+            Do not include any markdown, bullets, or decorative symbols.
+            Here's an example of a properly formatted question:
+            Q1. What is the capital of France?  
+            A. Berlin  
+            B. Madrid  
+            C. Paris  
+            D. Rome  
+            Answer: C`,
         },
       ],
     });
