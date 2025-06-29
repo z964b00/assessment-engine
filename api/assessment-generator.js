@@ -42,7 +42,17 @@ export default async function handler(req, res) {
       ],
     });
 
-    res.status(200).json({ quiz: chat.choices[0].message.content });
+    // 2b. Ask GPT for a broad subject (one word)
+    const subjectChat = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+            { role: "system", content: "You label topics." },
+            { role: "user", content: `In one word, what subject is this quiz about?\n\n---\n${text}` },
+        ],
+    });
+    const subject = subjectChat.choices[0].message.content.trim().split(/\s/)[0];
+
+    res.status(200).json({ quiz: chat.choices[0].message.content, subject });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
