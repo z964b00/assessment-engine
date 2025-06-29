@@ -44,7 +44,7 @@ export default async function handler(req, res) {
 
     // 2b. Ask GPT for a broad subject (one word)
     const subjectChat = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         messages: [
             { role: "system", content: "You label topics." },
             { role: "user", content: `In one word, what subject is this quiz about?\n\n---\n${text}` },
