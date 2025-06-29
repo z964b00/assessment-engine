@@ -1,3 +1,8 @@
+const supa = supabase.createClient(
+  "https://hwkcqsxqccjevteicolq.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3a2Nxc3hxY2NqZXZ0ZWljb2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTE1MzMsImV4cCI6MjA2NjU2NzUzM30.gaQ3oRG4U8DrSwm5f99hYyyXT2pQoQiLFgaFWvHntb4"
+);
+
 const API = "/api/assessment-generator.js?url=";
 const link = document.getElementById("link");
 const genBtn = document.getElementById("generate");
@@ -17,6 +22,7 @@ genBtn.onclick = async () => {
 
   const res = await fetch(API + encodeURIComponent(url));
   const data = await res.json();
+  window.currentSubject = data.subject || "General";
   loadDiv.classList.add("hidden");
   genBtn.disabled = false;
 
@@ -54,7 +60,7 @@ genBtn.onclick = async () => {
   resultsPre.textContent = "";
 };
 
-completeBtn.onclick = () => {
+completeBtn.onclick = async () => {
   const chosen = [];
   currentAnswers.forEach((_, i) => {
     const picked = (
@@ -75,6 +81,10 @@ completeBtn.onclick = () => {
   output += `\nTotal score: ${correct}/3\n`;
   resultsPre.textContent = output;
 
+  const subject = window.currentSubject || "General";
+  await supa.from("quiz_scores").insert([{ subject, score: correct }]);
+  updateScoreboard();
+
   // store temporary score in sessionStorage (Phase 3 will move to Supabase)
   sessionStorage.setItem("latestScore", correct);
 };
@@ -87,3 +97,27 @@ clearBtn.onclick = () => {
   quizForm.innerHTML = "";
   link.value = "";
 };
+
+async function updateScoreboard() {
+  const { data, error } = await supa
+    .from("quiz_scores")
+    .select("subject, score");
+  if (error) return console.error(error);
+
+  // Aggregate totals
+  const totals = {};
+  data.forEach(({ subject, score }) => {
+    totals[subject] = (totals[subject] || 0) + score;
+  });
+
+  const list = document.getElementById("scores");
+  list.innerHTML = "";
+  Object.entries(totals).forEach(([subj, pts]) => {
+    const li = document.createElement("li");
+    li.textContent = `${subj}: ${pts} pts`;
+    list.appendChild(li);
+  });
+}
+
+// Call once on page load
+updateScoreboard();
