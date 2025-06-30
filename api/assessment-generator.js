@@ -6,6 +6,10 @@ export default async function handler(req, res) {
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: "Missing url parameter" });
 
+  if (url.includes("youtube.com")) {
+    return res.status (501).json({ error: "YouTube transcripts not implemented."});
+  }
+
   try {
     // 1. Fetch page
     const html = await (await fetch(url)).text();
@@ -16,6 +20,9 @@ export default async function handler(req, res) {
 
     if (text.length < 200)
       return res.status(422).json({ error: "Could not extract enough text." });
+    
+    if (text.length > 10000)
+        return res.status(422).json({ error: "Article too long (10,000+ characters)." });
 
     // 2. Call GPT-4o
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
