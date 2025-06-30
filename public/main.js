@@ -18,12 +18,14 @@ genBtn.onclick = async () => {
   const url = link.value.trim();
   if (!url) return alert("Enter a link first.");
   loadDiv.classList.remove("hidden");
+  loadDiv.classList.add("blinking");
   genBtn.disabled = true;
 
   const res = await fetch(API + encodeURIComponent(url));
   const data = await res.json();
   window.currentSubject = data.subject || "General";
   loadDiv.classList.add("hidden");
+  loadDiv.classList.remove("blinking");
   genBtn.disabled = false;
 
   if (data.error) {
