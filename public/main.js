@@ -26,7 +26,10 @@ genBtn.onclick = async () => {
   loadDiv.classList.add("hidden");
   genBtn.disabled = false;
 
-  if (data.error) return alert(data.error);
+  if (data.error) {
+    resultsPre.textContent = "⚠️ " + data.error;
+    return;
+  }
 
   // Render questions
   quizForm.innerHTML = "";
