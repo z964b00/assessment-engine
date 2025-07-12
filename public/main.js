@@ -1,6 +1,6 @@
 const supa = supabase.createClient(
   "https://hwkcqsxqccjevteicolq.supabase.co",
-  "***REMOVED***"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3a2Nxc3hxY2NqZXZ0ZWljb2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTE1MzMsImV4cCI6MjA2NjU2NzUzM30.gaQ3oRG4U8DrSwm5f99hYyyXT2pQoQiLFgaFWvHntb4"
 );
 
 const API = "/api/assessment-generator.js?url=";
